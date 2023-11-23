@@ -1,0 +1,172 @@
+<?php declare(strict_types=1);
+error_reporting(E_ALL);
+// UTF-8 marker äöüÄÖÜß€
+
+require_once './Page.php';
+
+class Bestellung extends Page
+{
+
+    protected function __construct()
+    {
+        parent::__construct();
+    }
+
+
+    public function __destruct()
+    {
+        parent::__destruct();
+    }
+
+    protected function getViewData(): array
+    {
+        $sql = "SELECT* FROM article";
+        $recordSet = $this->_database->query($sql);
+        if(!$recordSet) {
+            throw new Exception("keine Article in der Datenbank");
+        }
+        $article_List = array();
+
+        while ($record = $recordSet->fetch_assoc()) {
+            $article_id = $record["article_id"];
+            $name = $record["name"];
+            $picture = $record["picture"];
+            $price = $record["price"];
+            $article_List[] = array(
+                "article_id" => $article_id,
+                "name" => $name,
+                "picture" => $picture,
+                "price" => $price
+            );
+        }
+
+        $recordSet->free();
+        return $article_List;
+    }
+
+   protected function generateView(): void
+    {
+    // Get the data from getViewData() method
+    $articleList = $this->getViewData();
+
+    echo <<<HTML
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PizzaShop</title>
+    </head>
+    <body>
+        <h1>
+            <strong>Bestellung</strong>
+        </h1>
+        <h2>
+            <strong>Speisekarte</strong>
+        </h2>
+    HTML;
+
+    // Loop through the article list obtained from getViewData()
+    foreach ($articleList as $article) {
+        echo <<<HTML
+            <img
+                width="150"
+                height="100"
+                src=$article[picture] alt="" title="$article[name]"
+            >
+            <br>
+            <p>{$article['name']}</p>
+            <p>{$article['price']}</p>
+        HTML;
+    }
+
+    echo <<<HTML
+        <h2>Warenkorb</h2>
+
+        <form action="Bestellung.php" method="post"  accept-charset="UTF-8">
+            <select name="warenkorb[]" id="selectPizza" class="selectPizza" onchange="seePrice()" size="7" multiple>
+                <option value="1">Vegetaria</option>
+                <option value="2">Salami</option>
+                <option value="3">Spinat-Hühnchen</option>
+            </select>
+
+            <p class="priceTotal">Total Price: 0,0 €</p>
+            <input type="hidden" name="totalPrice" id="totalPrice" value="0.00">
+
+            <div>
+                <input
+                    type="text"
+                    id="inputAddress"
+                    name="address-input"
+                    placeholder="Ihre Adresse"
+                    size="20"
+                >
+            </div>
+            <div>
+                <button type="reset">Alle Loschen</button>
+                <button
+                    type="button"
+                    onclick="clearSelecOption()"
+                >
+                    Auswahl Loschen
+                </button>
+                <button type="submit">Bestellen</button>
+            </div>
+        </form>
+
+        <br>
+
+        <script src="interact.js"></script>
+    </body>
+    </html>
+    HTML;
+}
+
+protected function processReceivedData(): void
+{
+    parent::processReceivedData();
+    session_start();
+
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['warenkorb'])) {
+        $address = $this->_database->real_escape_string($_POST['address-input']);
+        // Insert into "ordering" table 
+        $insertOrderingSQL = "INSERT INTO ordering (address) VALUES ('$address')";
+        $this->_database->query($insertOrderingSQL);
+
+        // Get the ordering_id of the inserted row
+        $orderingId = $this->_database->insert_id;
+
+        // Insert into "ordered_article" table for each selected article in the warenkorb
+        foreach ($_POST['warenkorb'] as $articleId) {
+            // You may want to validate $articleId to prevent SQL injection
+
+            // Insert into "ordered_article" table with auto-incremented ordering_id
+            $insertOrderedArticleSQL = "INSERT INTO ordered_article (ordering_id, article_id, status) VALUES ('$orderingId', '$articleId', 0)";
+            $this->_database->query($insertOrderedArticleSQL);
+        }
+
+        // PRG PATTERN
+        header('Location: Bestellung.php');
+        exit();
+    }
+}
+
+
+
+    public static function main():void
+    {
+        try {
+            $page = new Bestellung();
+            $page->processReceivedData();
+            $page->generateView();
+        } catch (Exception $e) {
+            header("Content-type: text/html; charset=UTF-8");
+            echo $e->getMessage();
+        }
+    }
+}
+
+
+Bestellung::main();
+
