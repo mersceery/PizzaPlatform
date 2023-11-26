@@ -19,27 +19,70 @@ class Kunde extends Page
 
     protected function getViewData():array
     {
-       $sql = "SELECT * FROM article";
-
-        $recordset = $this->_database->query($sql);
+        $pizza = array();
+        $query = "SELECT * FROM `ordered_article`
+        INNER JOIN `article` ON `ordered_article`.`article_id` = `article`.`article_id`
+        INNER JOIN `ordering` ON `ordered_article`.`ordering_id` = `ordering`.`ordering_id`
+        ORDER BY `ordering`.`ordering_id` ASC";
+        $recordset = $this->_database->query($query);
         if (!$recordset) {
             throw new Exception("Abfrage fehlgeschlagen: " . $this->_database->error);
         }
-        
-        $result = array();
         $record = $recordset->fetch_assoc();
         while ($record) {
-            $result[] = $record;
+            $pizza[] = $record;
             $record = $recordset->fetch_assoc();
         }
-    
         $recordset->free();
-        return $result;
+        return $pizza;
     }
 
     protected function generateView():void
     {
+        $data = $this->getViewData();
+        $this->generatePageHeader('Kunde'); //to do: set optional parameters
+        echo <<< HTML
+         <h1>
+            <strong>Kunde</strong>
+        </h1>
 
+        HTML;
+        $current_ordering_id = NULL;
+        for ($i = 0; $i < count($data); $i++) {
+            if ($current_ordering_id != $data[$i]['ordering_id']) {
+                $current_ordering_id = $data[$i]['ordering_id'];
+                echo <<< HTML
+                <h2>Bestellung: {$data[$i]['ordering_id']}</h2>
+                <h2>{$data[$i]['name']} - Order ID: {$data[$i]['ordering_id']} - Ordered at: {$data[$i]['ordering_time']}</h2>
+                <img
+                    width="150"
+                    height="100"
+                    src={$data[$i]['picture']} alt="" title="{$data[$i]['name']}"
+                >
+    HTML;
+            }
+            $status = $data[$i]['status'];
+            $isBestellt = ($status == 0) ? 'checked' : '';
+            $isImOffen = ($status == 1) ? 'checked' : '';
+            $isFertig = ($status == 2) ? 'checked' : '';
+            echo <<< HTML
+            
+            <form action="Kunde.php" method="post">
+                <meta http-equiv="Refresh" content="10; URL=Kunde.php">
+                <p>{$data[$i]['name']}<p>
+                <input type="radio" name="order_status_{$data[$i]['ordered_article_id']}" value="bestellt" {$isBestellt} disabled>
+                <label for="html">bestellt</label>
+                <input type="radio" name="order_status_{$data[$i]['ordered_article_id']}" value="im_offen" {$isImOffen} disabled>
+                <label for="html">im Offen</label>
+                <input type="radio" name="order_status_{$data[$i]['ordered_article_id']}" value="fertig" {$isFertig} disabled>                    
+                <label for="html">fertig</label>
+                <input type="hidden" name="ordering_id" value="{$data[$i]['ordering_id']}">
+                <input type="hidden" name="ordered_article_id" value="{$data[$i]['ordered_article_id']}">
+            </form>
+HTML;
+        }
+        // to do: output view of this page
+        $this->generatePageFooter();
     }
 
     protected function processReceivedData():void

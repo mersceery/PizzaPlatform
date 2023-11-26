@@ -17,8 +17,11 @@ class Fahrer extends Page
         parent::__destruct();
     }
 
-    protected function getViewData(): array{
-    $sql = "SELECT * FROM ordering";
+protected function getViewData(): array{
+    $sql = "SELECT * FROM `ordered_article`
+    INNER JOIN `article` ON `ordered_article`.`article_id` = `article`.`article_id`
+    INNER JOIN `ordering` ON `ordered_article`.`ordering_id` = `ordering`.`ordering_id`";
+
     $recordset = $this->_database->query($sql);
     if (!$recordset) {
         throw new Exception("Abfrage fehlgeschlagen: " . $this->_database->error);
@@ -29,7 +32,10 @@ class Fahrer extends Page
         $result[] = [
             "ordering_id" => $record["ordering_id"],
             "address" => $record["address"],
+            "status" => $record["status"],
+            "name" => $record["name"],
             "ordering_time" => $record["ordering_time"]
+            
         ];
     }
 
@@ -39,52 +45,78 @@ class Fahrer extends Page
 
     protected function generateView(): void
     {
-        $orderDetails = $this->getViewData();
+        $data = $this->getViewData();
+        $this->generatePageHeader('Fahrer'); //to do: set optional parameters
+
         echo <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>PizzaShop</title>
-        </head>
         <body>
             <h1>
                 <strong>Fahrer</strong>
             </h1>
-    
-            <section>
-                <form action="https://echo.fbi.h-da.de/" method="post" accept>
         HTML;
-    
-        foreach ($orderDetails as $order) {
-    
-            echo <<<HTML
-                <h2>Order ID: {$order['ordering_id']}</h2>
-                <p><strong>{$order['address']}</strong></p>
-                <p><strong>{$order['ordering_time']}</strong></p>
-                <br>
-                <input type="radio" id="fertig" name="{$order['ordering_id']}" value="fertig">fertig<br>
-                <input type="radio" id="unterwegs" name="{$order['ordering_id']}" value="unterwegs">unterwegs<br>
-                <input type="radio" id="geliefert" name="{$order['ordering_id']}" value="geliefert">geliefert<br>
-                <br>
-            HTML;
+        $current_order_id = NULL;
+        $pizza = "";
+        $print = false;
+        for ($i = 0; $i < count($data); $i++) {
+
+            if ($current_order_id != $data[$i]['ordering_id']) {
+                if ($current_order_id != NULL && $print) {
+                    substr($pizza, 0, -3);
+                    $status = $data[$i - 1]['status'];
+                    $isFertig = ($status == 2) ? 'checked' : '';
+                    $isUnterwegs = ($status == 3) ? 'checked' : '';
+                    $isGeliefert = ($status == 4) ? 'checked' : '';
+                    echo <<<HTML
+                    <form action="fahrer.php" method="post">
+                        <meta http-equiv="Refresh" content="10; URL=fahrer.php">
+                        <label><b>{$data[$i - 1]['address']}</b></label>
+                        <br>
+                        <label><b>$pizza</b></label>
+                        <br>
+                        <label><b>{$data[$i - 1]['ordering_id']}</b></label>
+                        <br>
+                        <input type="hidden" name="ordering_id" value="$current_order_id">
+                        <input type="radio" name="status" value="fertig" {$isFertig}>
+                        <label for="html">fertig</label>
+                        <input type="radio" name="status" value="unterwegs" {$isUnterwegs}>
+                        <label for="html">unterwegs</label>
+                        <input type="radio" name="status" value="geliefert" {$isGeliefert}>                    
+                        <label for="html">geliefert</label>
+                        <input type="submit" name="submit" value="Update">
+                    </form>
+HTML;
+                }
+                $current_order_id = $data[$i]['ordering_id'];
+                $pizza = "";
+                $print = true;
+            } else if ($data[$i]['status'] >= 2 && $print) {
+                $pizza .= $data[$i]['name'] . ", ";
+            } else {
+                $print = false;
+            }
         }
-    
-        echo <<<HTML
-                <input type="submit" value="Submit" value="status">
-                </form>
-            </section>
-        </body>
-        </html>
-        HTML;
+
+
+        // to do: output view of this page
+        $this->generatePageFooter();
     }
 
     protected function processReceivedData():void
     {
         parent::processReceivedData();
 
+        if (isset($_POST['submit']) && isset($_POST['ordering_id']) && isset($_POST['status'])) {
+            $status = $_POST['status'];
+            $status = ($status == 'fertig') ? 2 : (($status == 'unterwegs') ? 3 : 4);
+            $ordering_id = $_POST['ordering_id'];
+            $query = "UPDATE `ordered_article` SET `status` = '$status' WHERE `ordered_article`.`ordering_id` = '$ordering_id'";
+            $recordset = $this->_database->query($query);
+            if (!$recordset) {
+                throw new Exception("Abfrage fehlgeschlagen: " . $this->_database->error);
+            }
+            header("Location: fahrer.php", true, 303);
+            die();
+        }
     }
 
     public static function main():void
