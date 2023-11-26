@@ -111,6 +111,13 @@ class Baeker extends Page
         $data = $this->getViewData();
         $this->generatePageHeader('Baeker'); //to do: set optional parameters
         echo <<< HTML
+        <nav>
+        <a href="Uebersicht.php">Uebersicht</a>
+        <a href="Bestellung.php">Bestellung</a>
+        <a href="Kunde.php">Kunde</a>
+        <a href="Baeker.php">Baeker</a>
+        <a href="Fahrer.php">Fahrer</a>
+        </nav>
          <h1>
             <strong>Bäcker</strong>
         </h1>

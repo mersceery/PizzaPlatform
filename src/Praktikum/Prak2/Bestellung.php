@@ -59,6 +59,13 @@ class Bestellung extends Page
         <title>PizzaShop</title>
     </head>
     <body>
+    <nav>
+        <a href="Uebersicht.php">Uebersicht</a>
+        <a href="Bestellung.php">Bestellung</a>
+        <a href="Kunde.php">Kunde</a>
+        <a href="Baeker.php">Baeker</a>
+        <a href="Fahrer.php">Fahrer</a>
+        </nav>
         <h1>
             <strong>Bestellung</strong>
         </h1>
@@ -129,6 +136,13 @@ protected function processReceivedData(): void
     session_start();
 
     if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['warenkorb'])) {
+        $address = trim($_POST['address-input']);
+        if (empty($address)) {
+            // Address is blank, redirect back to the Bestellung.php page with an error message
+            $_SESSION['error_message'] = 'Bitte geben Sie Ihre Adresse ein.';
+            header('Location: Bestellung.php');
+            exit();
+        }
         $address = $this->_database->real_escape_string($_POST['address-input']);
         // Insert into "ordering" table 
         $insertOrderingSQL = "INSERT INTO ordering (address) VALUES ('$address')";
@@ -139,8 +153,6 @@ protected function processReceivedData(): void
 
         // Insert into "ordered_article" table for each selected article in the warenkorb
         foreach ($_POST['warenkorb'] as $articleId) {
-            // You may want to validate $articleId to prevent SQL injection
-
             // Insert into "ordered_article" table with auto-incremented ordering_id
             $insertOrderedArticleSQL = "INSERT INTO ordered_article (ordering_id, article_id, status) VALUES ('$orderingId', '$articleId', 0)";
             $this->_database->query($insertOrderedArticleSQL);

@@ -50,6 +50,13 @@ protected function getViewData(): array{
 
         echo <<<HTML
         <body>
+        <nav>
+        <a href="Uebersicht.php">Uebersicht</a>
+        <a href="Bestellung.php">Bestellung</a>
+        <a href="Kunde.php">Kunde</a>
+        <a href="Baeker.php">Baeker</a>
+        <a href="Fahrer.php">Fahrer</a>
+        </nav>
             <h1>
                 <strong>Fahrer</strong>
             </h1>
