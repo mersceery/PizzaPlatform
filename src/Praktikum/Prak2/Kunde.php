@@ -65,6 +65,8 @@ class Kunde extends Page
             $isBestellt = ($status == 0) ? 'checked' : '';
             $isImOffen = ($status == 1) ? 'checked' : '';
             $isFertig = ($status == 2) ? 'checked' : '';
+            $isUnterwegs = ($status == 3) ? 'checked' : '';
+            $isGeliefert = ($status == 4) ? 'checked' : '';
             echo <<< HTML
             
             <form action="Kunde.php" method="post">
@@ -76,6 +78,10 @@ class Kunde extends Page
                 <label for="html">im Offen</label>
                 <input type="radio" name="order_status_{$data[$i]['ordered_article_id']}" value="fertig" {$isFertig} disabled>                    
                 <label for="html">fertig</label>
+                <input type="radio" name="order_status_{$data[$i]['ordered_article_id']}" value="unterwegs" {$isUnterwegs} disabled>                    
+                <label for="html">unterweg</label>
+                <input type="radio" name="order_status_{$data[$i]['ordered_article_id']}" value="geliefert" {$isGeliefert} disabled>                    
+                <label for="html">geliefert</label>
                 <input type="hidden" name="ordering_id" value="{$data[$i]['ordering_id']}">
                 <input type="hidden" name="ordered_article_id" value="{$data[$i]['ordered_article_id']}">
             </form>
