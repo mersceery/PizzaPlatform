@@ -89,17 +89,16 @@ abstract class Page
     {
         $title = htmlspecialchars($title);
         header("Content-type: text/html; charset=UTF-8");
-
-        echo <<<EOT
-<!DOCTYPE html>
-<html lang="de">  
-  <head>
-    <meta charset="UTF-8" />
-	<title>$title</title>
-	<link rel="stylesheet" href="Exam21.css">
-    <script src="Exam21.js"> </script>
-  </head>
-EOT;
+        //set html lang
+        echo <<<HTML
+        <!DOCTYPE html>
+        <html lang="de">
+            <head>
+                <meta charset="UTF-8">
+                <title>$title</title>
+            </head>
+            <body>
+        HTML;
 
     }
 
@@ -109,7 +108,10 @@ EOT;
      */
     protected function generatePageFooter():void
     {
-        echo "</html>";
+        echo <<<HTML
+            </body>
+        </html>
+        HTML;
     }
 
     /**
