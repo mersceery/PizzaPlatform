@@ -93,8 +93,8 @@ class Bestellung extends Page
 
         <form action="Bestellung.php" method="post"  accept-charset="UTF-8">
             <select name="warenkorb[]" id="selectPizza" class="selectPizza" onchange="seePrice()" size="7" multiple>
-                <option value="1">Vegetaria</option>
-                <option value="2">Salami</option>
+                <option value="1">Salami</option>
+                <option value="2">Vegetaria</option>
                 <option value="3">Spinat-Hühnchen</option>
             </select>
 

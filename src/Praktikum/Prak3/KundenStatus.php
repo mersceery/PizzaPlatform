@@ -3,7 +3,7 @@
 
 require_once './Page.php';
 
-class Kunde extends Page
+class KundenStatus  extends Page
 {
     protected function __construct()
     {
@@ -17,7 +17,6 @@ class Kunde extends Page
 
     protected function getViewData(): array
 {
-    session_start();
     if ($_SESSION) {
         $lastOrderingId = (int)$_SESSION['last_ordering_id'];
 
@@ -50,7 +49,8 @@ class Kunde extends Page
 
 
     protected function generateView(): void
-    {
+    {   
+        header("Content-Type: application/json; charset=UTF-8"); // Set JSON header
         $list = $this->getViewData();
         $jsonString = json_encode($list);
         echo $jsonString;
@@ -64,7 +64,8 @@ class Kunde extends Page
     public static function main(): void
     {
         try {
-            $page = new Kunde();
+            session_start();
+            $page = new KundenStatus ();
             $page->processReceivedData();
             $page->generateView();
         } catch (Exception $e) {
@@ -74,4 +75,4 @@ class Kunde extends Page
     }
 }
 
-Kunde::main();
+KundenStatus ::main();
