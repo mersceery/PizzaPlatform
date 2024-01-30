@@ -1,0 +1,19 @@
+body{
+    background-image: url(../images/bg_pizza.jpg);
+    background-size: cover;
+    color: black;
+    font-family: Garamond;
+}
+
+.topnav{
+    align-items: center;
+    justify-content: center;
+}
+
+.topnav a {
+    color: #000000;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
