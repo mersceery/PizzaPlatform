@@ -1,5 +1,5 @@
 body {
-    font-family: 'Helvetica', sans-serif; /* Change to your preferred font */
+    font-family: 'Helvetica', sans-serif;
     background-image: url('bg.jpeg');
     background-size: cover;
     background-position: center;
@@ -15,7 +15,7 @@ nav {
 
 nav a {
     display: inline-block;
-    color: black; /* Set text color to black */
+    color: white;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -58,6 +58,16 @@ select {
 
 #inputAddress {
     width: 100%;
+}
+
+/* Center the warenkorb box */
+form {
+    width: 400px; /* Set a fixed width */
+    margin: 0 auto; /* Center the box */
+    background-color: white; /* Set background color to white */
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
 }
 
 button {
