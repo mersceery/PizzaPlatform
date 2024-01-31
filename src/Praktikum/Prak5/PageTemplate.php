@@ -31,7 +31,7 @@ require_once './Page.php';
  * @author   Bernhard Kreling, <bernhard.kreling@h-da.de>
  * @author   Ralf Hahn, <ralf.hahn@h-da.de>
  */
-class KundenStatus extends Page
+class PageTemplate extends Page
 {
     // to do: declare reference variables for members 
     // representing substructures/blocks
@@ -68,24 +68,7 @@ class KundenStatus extends Page
     {
         // to do: fetch data for this view from the database
         // to do: return array containing data
-        //take ordering_id from session
-        if (!isset($_SESSION['ordering_id'])) {
-            return array();
-        }
-        $ordering_id_SES = $_SESSION['ordering_id'];
-
-        $query = "SELECT ordering.ordering_id, ordered_article_id, ordered_article.article_id, article.name, ordered_article.status FROM `ordered_article`
-        INNER JOIN `article` ON `ordered_article`.`article_id` = `article`.`article_id`
-        INNER JOIN `ordering` ON `ordered_article`.`ordering_id` = $ordering_id_SES
-        WHERE `ordering`.`ordering_id` = $ordering_id_SES";
-        $result = $this->_database->query($query);
-
-        $statusData = array();
-        while ($row = $result->fetch_assoc()) {
-            $statusData[] = $row;
-        }
-
-        return $statusData;
+        return array();
     }
 
     /**
@@ -99,19 +82,9 @@ class KundenStatus extends Page
     protected function generateView(): void
     {
         $data = $this->getViewData();
-        //$this->generatePageHeader('to do: change headline'); //to do: set optional parameters
+        $this->generatePageHeader('to do: change headline'); //to do: set optional parameters
         // to do: output view of this page
-        //$this->generatePageFooter();
-        header("Content-type: application/json; charset=UTF-8");
-
-        //Set the character encoding for JSON encoding
-        mb_internal_encoding('UTF-8');
-
-        //Serialize the data as json
-        $serializedData = json_encode($data, JSON_UNESCAPED_UNICODE);
-
-        //Output the serialized data
-        echo $serializedData;
+        $this->generatePageFooter();
     }
 
     /**
@@ -140,8 +113,7 @@ class KundenStatus extends Page
     public static function main(): void
     {
         try {
-            session_start();
-            $page = new KundenStatus();
+            $page = new PageTemplate();
             $page->processReceivedData();
             $page->generateView();
         } catch (Exception $e) {
@@ -154,7 +126,7 @@ class KundenStatus extends Page
 
 // This call is starting the creation of the page. 
 // That is input is processed and output is created.
-KundenStatus::main();
+PageTemplate::main();
 
 // Zend standard does not like closing php-tag!
 // PHP doesn't require the closing tag (it is assumed when the file ends). 

@@ -1,0 +1,83 @@
+/* kunde_styles.css */
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background-color: #f8f8f8;
+    color: #333;
+}
+
+.bg-kunde{
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #4CAF50;
+    text-align: center;
+}
+
+.topnav {
+    overflow: hidden;
+    background-color: #4CAF50;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.topnav a {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.topnav a:hover {
+    background-color: #45a049;
+}
+
+.order {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: box-shadow 0.3s;
+}
+
+.order:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.radio {
+    margin-bottom: 15px;
+}
+
+.radio label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.radio input {
+    margin-right: 5px;
+}
+
+hr {
+    border: 1px solid #ddd;
+}

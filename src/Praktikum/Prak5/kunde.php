@@ -3,21 +3,21 @@
 declare(strict_types=1);
 // UTF-8 marker äöüÄÖÜß€
 /**
- * Class PageTemplate for the exercises of the EWA lecture
+ * Class Kunde for the exercises of the EWA lecture
  * Demonstrates use of PHP including class and OO.
  * Implements Zend coding standards.
  * Generate documentation with Doxygen or phpdoc
  *
  * PHP Version 7.4
  *
- * @file     PageTemplate.php
+ * @file     Kunde.php
  * @package  Page Templates
  * @author   Bernhard Kreling, <bernhard.kreling@h-da.de>
  * @author   Ralf Hahn, <ralf.hahn@h-da.de>
  * @version  3.1
  */
 
-// to do: change name 'PageTemplate' throughout this file
+// to do: change name 'Kunde' throughout this file
 require_once './Page.php';
 
 /**
@@ -31,7 +31,7 @@ require_once './Page.php';
  * @author   Bernhard Kreling, <bernhard.kreling@h-da.de>
  * @author   Ralf Hahn, <ralf.hahn@h-da.de>
  */
-class KundenStatus extends Page
+class Kunde extends Page
 {
     // to do: declare reference variables for members 
     // representing substructures/blocks
@@ -66,26 +66,30 @@ class KundenStatus extends Page
      */
     protected function getViewData(): array
     {
-        // to do: fetch data for this view from the database
-        // to do: return array containing data
         //take ordering_id from session
         if (!isset($_SESSION['ordering_id'])) {
             return array();
         }
         $ordering_id_SES = $_SESSION['ordering_id'];
-
-        $query = "SELECT ordering.ordering_id, ordered_article_id, ordered_article.article_id, article.name, ordered_article.status FROM `ordered_article`
+        // to do: fetch data for this view from the database
+        // to do: return array containing data
+        $pizza = array();
+        $query = "SELECT * FROM `ordered_article`
         INNER JOIN `article` ON `ordered_article`.`article_id` = `article`.`article_id`
         INNER JOIN `ordering` ON `ordered_article`.`ordering_id` = $ordering_id_SES
-        WHERE `ordering`.`ordering_id` = $ordering_id_SES";
-        $result = $this->_database->query($query);
-
-        $statusData = array();
-        while ($row = $result->fetch_assoc()) {
-            $statusData[] = $row;
+        WHERE `ordering`.`ordering_id` = $ordering_id_SES
+        ORDER BY `ordered_article`.`ordering_id` ASC";
+        $recordset = $this->_database->query($query);
+        if (!$recordset) {
+            throw new Exception("Abfrage fehlgeschlagen: " . $this->_database->error);
         }
-
-        return $statusData;
+        $record = $recordset->fetch_assoc();
+        while ($record) {
+            $pizza[] = $record;
+            $record = $recordset->fetch_assoc();
+        }
+        $recordset->free();
+        return $pizza;
     }
 
     /**
@@ -99,19 +103,23 @@ class KundenStatus extends Page
     protected function generateView(): void
     {
         $data = $this->getViewData();
-        //$this->generatePageHeader('to do: change headline'); //to do: set optional parameters
+        $this->generatePageHeader('Kunde Bestellungsinformation', 'UpdateStatus.js', 'kunde.css'); //to do: set optional parameters
+        echo <<<HTML
+        <div class="bg-kunde">
+        HTML;
+        // Add the status container
+        echo '<section id="status-container"></section>';
+
+        // Include the UpdateStatus.js script with the correct path to KundenStatus.php
+        echo '<script src="UpdateStatus.js"></script>';
+
+        echo <<<HTML
+        <div class="blank-box"></div>
+        </div>
+        HTML;
+
         // to do: output view of this page
-        //$this->generatePageFooter();
-        header("Content-type: application/json; charset=UTF-8");
-
-        //Set the character encoding for JSON encoding
-        mb_internal_encoding('UTF-8');
-
-        //Serialize the data as json
-        $serializedData = json_encode($data, JSON_UNESCAPED_UNICODE);
-
-        //Output the serialized data
-        echo $serializedData;
+        $this->generatePageFooter();
     }
 
     /**
@@ -140,8 +148,9 @@ class KundenStatus extends Page
     public static function main(): void
     {
         try {
+
             session_start();
-            $page = new KundenStatus();
+            $page = new Kunde();
             $page->processReceivedData();
             $page->generateView();
         } catch (Exception $e) {
@@ -154,7 +163,7 @@ class KundenStatus extends Page
 
 // This call is starting the creation of the page. 
 // That is input is processed and output is created.
-KundenStatus::main();
+Kunde::main();
 
 // Zend standard does not like closing php-tag!
 // PHP doesn't require the closing tag (it is assumed when the file ends). 
