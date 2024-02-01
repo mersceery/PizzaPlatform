@@ -66,24 +66,48 @@ class Fahrer extends Page
      */
     protected function getViewData(): array
     {
-        // to do: fetch data for this view from the database
-        // to do: return array containing data
-        $pizza = array();
-        $query = "SELECT * FROM `ordered_article`
-                INNER JOIN `article` ON `ordered_article`.`article_id` = `article`.`article_id`
-                INNER JOIN `ordering` ON `ordered_article`.`ordering_id` = `ordering`.`ordering_id`
-                ORDER BY `ordered_article`.`ordering_id` ASC ,`ordered_article`.`ordered_article_id` ASC";
-        $recordset = $this->_database->query($query);
+        $sql = "SELECT * FROM ordered_article
+            INNER JOIN article ON ordered_article.article_id = article.article_id
+            INNER JOIN ordering ON ordered_article.ordering_id = ordering.ordering_id
+            WHERE ordered_article.status < 4";
+
+        $recordset = $this->_database->query($sql);
         if (!$recordset) {
             throw new Exception("Abfrage fehlgeschlagen: " . $this->_database->error);
         }
-        $record = $recordset->fetch_assoc();
-        while ($record) {
-            $pizza[] = $record;
-            $record = $recordset->fetch_assoc();
+
+        $result = array();
+        while ($record = $recordset->fetch_assoc()) {
+            $orderingID = $record["ordering_id"];
+            $status = $record["status"];
+
+            // Check if all pizzas in the order are marked as 'fertig' (status 2) or 'unterwegs' (status 3)
+            $pizzaStatusSql = "SELECT status FROM ordered_article WHERE ordering_id = '$orderingID'";
+            $pizzaStatusRecordset = $this->_database->query($pizzaStatusSql);
+
+            $allPizzasFertigOrUnterwegs = true;
+            while ($pizzaRecord = $pizzaStatusRecordset->fetch_assoc()) {
+                if ($pizzaRecord["status"] != 2 && $pizzaRecord["status"] != 3) {
+                    $allPizzasFertigOrUnterwegs = false;
+                    break;
+                }
+            }
+            $pizzaStatusRecordset->free();
+
+            if ($allPizzasFertigOrUnterwegs) {
+                // If all pizzas are 'fertig' or 'unterwegs', add the order to the result array
+                $result[] = [
+                    "ordering_id" => $orderingID,
+                    "address" => $record["address"],
+                    "status" => $status,
+                    "name" => $record["name"],
+                    "ordering_time" => $record["ordering_time"],
+                ];
+            }
         }
+
         $recordset->free();
-        return $pizza;
+        return $result;
     }
 
     /**
@@ -97,8 +121,8 @@ class Fahrer extends Page
     protected function generateView(): void
     {
         $data = $this->getViewData();
-        $this->generatePageHeader('Fahrer Seite', '', 'fahrer.css'); //to do: set optional parameters
-        // Output JavaScript code for automatic page refresh
+        $this->generatePageHeader('Fahrer Seite', '', 'fahrer.css');
+    
         echo <<<HTML
         <script>
             setTimeout(function() {
@@ -106,87 +130,100 @@ class Fahrer extends Page
             }, 10000);
         </script>
         HTML;
-
-        //section for content
+    
         echo <<<HTML
         <section class="content">
-                <div>
-                    <h1>Fahrer</h1>
-                </div>
-                    <hr>
-                <div class="topnav">
-                    <a class="active" href="bestellung.php">Bestellung</a>
-                    <a href="baecker.php">Baecker</a>
-                    <a href="fahrer.php">Fahrer</a>
-                    <a href="kunde.php">Kunde</a>
-                </div>
+            <div>
+                <h1>Fahrer</h1>
+            </div>
+            <hr>
+            <div class="topnav">
+                <a class="active" href="bestellung.php">Bestellung</a>
+                <a href="baecker.php">Baecker</a>
+                <a href="fahrer.php">Fahrer</a>
+                <a href="kunde.php">Kunde</a>
+            </div>
         HTML;
-        $current_order_id = NULL;
-        $pizza = "";
-        $print = true;
-        for ($i = 0; $i < count($data); $i++) {
-
-            if ($i == count($data) - 1) {
-                $pizza .= $data[$i]['name'] . ", ";
-            }
-
-            if (($current_order_id != $data[$i]['ordering_id']) || ($i == count($data) - 1)) {
-                if ($current_order_id != NULL && $print) {
-                    $current_order_id = $data[0]['ordering_id'];
-                    $pizza = substr($pizza, 0, -2);
-                    $special_pizza = htmlspecialchars($pizza);
-                    $status = $data[$i - 1]['status'];
-                    $isFertig = ($status == 2) ? 'checked' : '';
-                    $isUnterwegs = ($status == 3) ? 'checked' : '';
-                    $isGeliefert = ($status == 4) ? 'checked' : '';
-                    $special_address = htmlspecialchars($data[$i - 1]['address']);
-                    $special_ordering_id = htmlspecialchars($data[$i - 1]['ordering_id']);
-                    echo <<<HTML
-                    <section class="order">
-                    <form id="formid$special_ordering_id" action="fahrer.php" method="post">
-                        <fieldset>
-                        <p>Bestellnummer: $special_ordering_id</p>
-                        <p>$special_address</p>
-                        <p>$special_pizza</p>
-                        <section class="radio">
-                            <input type="radio" id="fertig" name="status" value="fertig" {$isFertig} onclick="document.forms['formid$special_ordering_id'].submit();" >
-                            <label for="fertig">fertig</label>
-                        </section>
-                        <section class="radio">
-                            <input type="radio" id="unterwegs" name="status" value="unterwegs" {$isUnterwegs} onclick="document.forms['formid$special_ordering_id'].submit();" >
-                            <label for="unterwegs">unterwegs</label>
-                        </section>
-                        <section class="radio">
-                            <input type="radio" id="geliefert" name="status" value="geliefert" {$isGeliefert} onclick="document.forms['formid$special_ordering_id'].submit();" >                    
-                            <label for="geliefert">geliefert</label>
-                        </section>
-                        <input type="hidden" name="ordering_id" value="$current_order_id">
-                        <input type="hidden" name="ordering_id" value="{$data[$i-1]['ordering_id']}">
-                        <br>
-                        </fieldset>
-                    </form>
-                    </section>
-                    HTML;
+    
+        $current_order_id = null;
+        $pizza = ""; // Accumulator for pizza names in an order
+    
+        foreach ($data as $item) {
+            if ($current_order_id !== $item['ordering_id']) {
+                // Output the information of the previous order
+                if ($current_order_id !== null) {
+                    $this->outputOrderInfo($current_order_id, $pizza);
                 }
-            }
-            if ($current_order_id != $data[$i]['ordering_id']) {
-                $current_order_id = $data[$i]['ordering_id'];
-                $pizza = "";
-                $print = true;
-            }
-            if ($data[$i]['status'] >= 2 && $print) {
-                $pizza .= $data[$i]['name'] . ", ";
+    
+                // Reset variables for the new order
+                $current_order_id = $item['ordering_id'];
+                $pizza = $item['name'] . ", ";
             } else {
-                $print = false;
+                $pizza .= $item['name'] . ", ";
             }
         }
-        //close section
+    
+        // Output the information of the last order
+        if ($current_order_id !== null) {
+            $this->outputOrderInfo($current_order_id, $pizza);
+        }
+    
         echo <<<HTML
         </section>
         HTML;
-        // to do: output view of this page
+    
         $this->generatePageFooter();
     }
+    
+    
+    private function outputOrderInfo($ordering_id, $pizza)
+    {
+        $pizza = rtrim($pizza, ", ");
+        $data = $this->getViewData(); // Refresh the data for the current order
+    
+        // Find the corresponding data for the current order
+        $orderData = array_values(
+            array_filter($data, function ($item) use ($ordering_id) {
+                return $item['ordering_id'] == $ordering_id;
+            })
+        )[0];
+    
+        $status = $orderData['status'];
+        $isFertig = ($status == 2) ? 'checked' : '';
+        $isUnterwegs = ($status == 3) ? 'checked' : '';
+        $isGeliefert = ($status == 4) ? 'checked' : '';
+    
+        $special_pizza = htmlspecialchars($pizza);
+        $special_address = htmlspecialchars($orderData['address']);
+        $special_ordering_id = htmlspecialchars($orderData['ordering_id']);
+    
+        echo <<<HTML
+        <section class="order">
+            <form id="formid$special_ordering_id" action="fahrer.php" method="post">
+                <fieldset>
+                    <p>Bestellnummer: $special_ordering_id</p>
+                    <p>$special_address</p>
+                    <p>$special_pizza</p>
+                    <section class="radio">
+                        <input type="radio" id="fertig" name="status" value="fertig" {$isFertig} onclick="document.forms['formid$special_ordering_id'].submit();" >
+                        <label for="fertig">fertig</label>
+                    </section>
+                    <section class="radio">
+                        <input type="radio" id="unterwegs" name="status" value="unterwegs" {$isUnterwegs} onclick="document.forms['formid$special_ordering_id'].submit();" >
+                        <label for="unterwegs">unterwegs</label>
+                    </section>
+                    <section class="radio">
+                        <input type="radio" id="geliefert" name="status" value="geliefert" {$isGeliefert} onclick="document.forms['formid$special_ordering_id'].submit();" >                    
+                        <label for="geliefert">geliefert</label>
+                    </section>
+                    <input type="hidden" name="ordering_id" value="$ordering_id">
+                    <br>
+                </fieldset>
+            </form>
+        </section>
+        HTML;
+    }
+    
 
     /**
      * Processes the data that comes via GET or POST.
