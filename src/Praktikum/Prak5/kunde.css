@@ -5,24 +5,25 @@ body {
     margin: 0;
     background-color: #f8f8f8;
     color: #333;
+    font-size: 16px; /* Base font size for the document */
 }
 
-.bg-kunde{
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
+.bg-kunde {
+    max-width: 50rem; /* Equivalent to 800px / 16px (base font size) */
+    margin: 1.25rem auto; /* Equivalent to 20px / 16px (base font size) */
+    padding: 1.25rem; /* Equivalent to 20px / 16px (base font size) */
     background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem; /* Equivalent to 8px / 16px (base font size) */
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.1); /* Equivalent to 20px / 16px (base font size) */
 }
 
 .content {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
+    max-width: 50rem; /* Equivalent to 800px / 16px (base font size) */
+    margin: 1.25rem auto; /* Equivalent to 20px / 16px (base font size) */
+    padding: 1.25rem; /* Equivalent to 20px / 16px (base font size) */
     background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem; /* Equivalent to 8px / 16px (base font size) */
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.1); /* Equivalent to 20px / 16px (base font size) */
 }
 
 h1 {
@@ -33,17 +34,17 @@ h1 {
 .topnav {
     overflow: hidden;
     background-color: #4CAF50;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    border-radius: 0.3125rem; /* Equivalent to 5px / 16px (base font size) */
+    margin-bottom: 1.25rem; /* Equivalent to 20px / 16px (base font size) */
 }
 
 .topnav a {
     float: left;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 0.875rem 1rem; /* Equivalent to 14px / 16px (base font size) */
     text-decoration: none;
-    font-size: 16px;
+    font-size: 1rem; /* Equivalent to 16px / 16px (base font size) */
     transition: background-color 0.3s;
 }
 
@@ -52,32 +53,50 @@ h1 {
 }
 
 .order {
-    margin: 20px 0;
-    padding: 20px;
+    margin: 1.25rem 0; /* Equivalent to 20px / 16px (base font size) */
+    padding: 1.25rem; /* Equivalent to 20px / 16px (base font size) */
     background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 0.0625rem solid #ddd; /* Equivalent to 1px / 16px (base font size) */
+    border-radius: 0.5rem; /* Equivalent to 8px / 16px (base font size) */
     transition: box-shadow 0.3s;
 }
 
 .order:hover {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.1); /* Equivalent to 20px / 16px (base font size) */
 }
 
 .radio {
-    margin-bottom: 15px;
+    margin-bottom: 0.9375rem; /* Equivalent to 15px / 16px (base font size) */
 }
 
 .radio label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem; /* Equivalent to 10px / 16px (base font size) */
     font-weight: bold;
 }
 
 .radio input {
-    margin-right: 5px;
+    margin-right: 0.3125rem; /* Equivalent to 5px / 16px (base font size) */
 }
 
 hr {
-    border: 1px solid #ddd;
+    border: 0.0625rem solid #ddd; /* Equivalent to 1px / 16px (base font size) */
+}
+
+/* Media Queries for Responsive Design */
+@media only screen and (max-width: 600px) {
+    .bg-kunde,
+    .content {
+        max-width: 90%;
+    }
+
+    .topnav a {
+        padding: 0.625rem 0.5rem;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    h1 {
+        font-size: 1.5rem;
+    }
 }
