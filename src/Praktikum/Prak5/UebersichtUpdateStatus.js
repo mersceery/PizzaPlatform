@@ -30,35 +30,19 @@ function process(jsonData) {
     while (statusContainer.firstChild) {
         statusContainer.removeChild(statusContainer.firstChild);
     }
-    // Make h1 for kunde string
-    const kunde = document.createElement("h1");
-    kunde.textContent = "Kunde";
-    statusContainer.appendChild(kunde);
+    // Make h1 for uebersicht string
+    const uebersicht = document.createElement("h1");
+    uebersicht.textContent = "Uebersicht Endkunde";
+    statusContainer.appendChild(uebersicht);
     // Make hr
     const hr = document.createElement("hr");
     statusContainer.appendChild(hr);
     const navbar = document.createElement("div");
     navbar.classList.add("topNav");
-    const nav5 = document.createElement("a");
-    nav5.textContent = "Uebersicht"; // Updated text to "Uebersicht"
-    nav5.href = "Uebersicht.php"; // Updated href to "Uebersicht.php"
-    navbar.appendChild(nav5);
     const nav1 = document.createElement("a");
-    nav1.textContent = "Bestellung";
-    nav1.href = "bestellung.php";
+    nav1.textContent = "Uebersicht"; // Updated text to "Uebersicht"
+    nav1.href = "Uebersicht.php"; // Updated href to "Uebersicht.php"
     navbar.appendChild(nav1);
-    const nav2 = document.createElement("a");
-    nav2.textContent = "Baecker";
-    nav2.href = "baecker.php";
-    navbar.appendChild(nav2);
-    const nav3 = document.createElement("a");
-    nav3.textContent = "Fahrer";
-    nav3.href = "fahrer.php";
-    navbar.appendChild(nav3);
-    const nav4 = document.createElement("a");
-    nav4.textContent = "Kunde";
-    nav4.href = "kunde.php";
-    navbar.appendChild(nav4);
     statusContainer.appendChild(navbar);
     // Style navbar
     const nav = document.getElementsByClassName("topNav");
@@ -98,6 +82,7 @@ function process(jsonData) {
             } else if (i === 4) {
                 label.textContent = "Geliefert";
             }
+
             statusElement.appendChild(label);
             // Add spacing between radio buttons
             statusElement.appendChild(document.createTextNode(" "));

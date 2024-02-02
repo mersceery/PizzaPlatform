@@ -95,20 +95,21 @@ class Bestellung extends Page
     protected function generateView(): void
     {
         $data = $this->getViewData();
-        $this->generatePageHeader('Pizza Service', 'script.js', 'bestellung.css'); //to do: set optional parameters
+        $this->generatePageHeader('Pizza Service', 'script.js', 'bestellung.css');
 
         echo <<< HTML
-        <section class = "content">
+        <section class="content">
             <h1>Bestellung</h1>
             <hr>
             <div class="topnav">
+                <a href="Uebersicht.php">Übersicht</a>
                 <a class="active" href="bestellung.php">Bestellung</a>
                 <a href="baecker.php">Baecker</a>
                 <a href="fahrer.php">Fahrer</a>
                 <a href="kunde.php">Kunde</a>
             </div>
-            <section class = "flex-container">
-                <section class = "menu">
+            <section class="flex-container">
+                <section class="menu">
         HTML;
 
         for ($i = 0; $i < count($data); $i++) {
@@ -118,9 +119,10 @@ class Bestellung extends Page
             $special_pizza_name = htmlspecialchars($pizza_name);
             $price = $data[$i][2];
             $special_price = htmlspecialchars($price);
+
             echo <<< HTML
-            <section class = "flex-menu">
-                <section class = "p-image">
+            <section class="flex-menu">
+                <section class="p-image">
                     <img
                         width="100"
                         height="100"
@@ -129,54 +131,43 @@ class Bestellung extends Page
                         onclick="addToCart('$special_pizza_name','$special_price','$special_article_id')"
                     />
                 </section>
-                <section class = "p-name">
+                <section class="p-name">
                     <p>&nbsp; $special_pizza_name &nbsp;&nbsp;</p>
                 </section>
-                <section class = "p-price">
+                <section class="p-price">
                     <p>$ $special_price</p>
                 </section>
             </section>
             HTML;
         }
+
         echo <<< HTML
                 </section>
-            <section class = "cart">
-        HTML;
-
-        //close section class speisekarte
-        echo<<<HTML
-        </section>
-        HTML;
-
-        echo <<< HTML
-        <form action="bestellung.php" method="post">
-            <p>Warenkorb</p>
-            <select class = "scroll-warenkorb" tabindex="1" name="pizza[]" id="cart" multiple="multiple" onchange="checkInputs()">
-            </select>
-            
-            <p id="total">Price:</p>
-            <section class = "carts-buttons">
-                <button type="button" tabindex="2" accesskey="a" onclick="removeFromCart()">Auswahl Loeschen</button>
-                <button type="button" tabindex="3" accesskey="l" onclick="clearCart()">Alle Loeschen</button>
-            </section>
-            <section class = "input-data">
-                <input name="Adresse" class = "et-adress" id="inputAddress" type="text" value="" placeholder="ihre Adresse" oninput="checkInputs()">
-                <button tabindex="4" id="btnSubmit" type="submit" accesskey="b" value="Bestellen" onclick="selectAll(); window.open('http://localhost/Praktikum/Prak5/kunde.php');" disabled>Bestellen</button>
-            </section>
-        </form>
-        HTML;
-
-        echo <<< HTML
+                <section class="cart">
+                    <form action="bestellung.php" method="post">
+                        <p>Warenkorb</p>
+                        <select class="scroll-warenkorb" tabindex="1" name="pizza[]" id="cart" multiple="multiple" onchange="checkInputs()">
+                        </select>
+                        
+                        <p id="total">Price:</p>
+                        <section class="carts-buttons">
+                            <button type="button" tabindex="2" accesskey="a" onclick="removeFromCart()">Auswahl Loeschen</button>
+                            <button type="button" tabindex="3" accesskey="l" onclick="clearCart()">Alle Loeschen</button>
+                        </section>
+                        <section class="input-data">
+                            <input name="Adresse" class="et-adress" id="inputAddress" type="text" value="" placeholder="ihre Adresse" oninput="checkInputs()">
+                            <button tabindex="4" id="btnSubmit" type="submit" accesskey="b" value="Bestellen" onclick="selectAll(); window.open('http://localhost/Praktikum/Prak5/Uebersicht.php');" disabled>Bestellen</button>
+                        </section>
+                    </form>
                 </section>
             </section>
         </section>
         HTML;
 
-        //close section class content
-        echo<<<HTML
+        echo <<< HTML
         </section>
         HTML;
-        // to do: output view of this page
+
         $this->generatePageFooter();
     }
 

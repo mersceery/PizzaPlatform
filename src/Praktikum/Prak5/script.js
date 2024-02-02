@@ -16,7 +16,6 @@ function removeFromCart(){
     "use strict";
     var cart = document.getElementById("cart");
     var selected = findAllSelected();
-
     //remove all selected items using for each
     selected.forEach(function(item){
         cart.removeChild(item);
@@ -42,18 +41,14 @@ function countTotalPrice() {
     "use strict";
     var totalElement = document.getElementById("total");
     totalElement.textContent = "";
-  
     var cart = document.getElementById("cart");
     var total = Number("0.00");
-  
     for (var i = 0; i < cart.length; i++) {
       total += parseFloat(Number(cart.options[i].price));
     }
-
     totalElement.textContent = "Price: $" + total.toFixed(2).toString();
     checkInputs();
 }
-  
 
 //clear cart
 function clearCart(){
@@ -78,7 +73,6 @@ function checkInputs(){
     var cartValue = cart.options.value;
     var addressValue = document.getElementById("inputAddress").value;
     var btnSubmit = document.getElementById("btnSubmit");
-
     if((cart.options[0] == null ) || addressValue == ""){
         btnSubmit.disabled = true;
     }else{
